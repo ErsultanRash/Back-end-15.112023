@@ -24,7 +24,7 @@ jobs:
         run: |
           python manage.py test
           sshpass -p ${{ secrets.PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@68.183.145.90 -p 22 "
-            cd /root/myproject &&
+            cd /root/Back-end-15.112023 &&
             source ./venv/bin/activate &&
             git pull &&
             python manage.py migrate &&
