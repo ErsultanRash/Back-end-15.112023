@@ -12,22 +12,29 @@ jobs:
         python-version: [3.9]
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }} 
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }} 
+          python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run Tests and Deployment
+      - name: Run Tests
         run: |
+          dir
           python manage.py test
-          sshpass -p ${{ secrets.PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@68.183.145.90 -p 22 "
-            cd /root/Back-end-15.112023 &&
-            source ./venv/bin/activate &&
-            git pull &&
-            python manage.py migrate &&
-            python manage.py collectstatic --noinput &&
-            supervisorctl restart all
-          "
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: 68.183.145.90
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          script: |
+            cd back
+            source /root/Back-end-15.112023/venv/bin/activate
+            git pull
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+            sudo supervisorctl restart all
